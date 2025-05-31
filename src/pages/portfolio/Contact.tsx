@@ -188,9 +188,9 @@ const Contact = () => {
                       {loading ? 'Sending...' : 'Send Message'}
                     </Button>
                     <p className="text-center text-lg text-brown-800 mb-3">
-                        Already have a website in mind? Fill out a{' '}
+                        Already have a website in mind? {' '}
                         <NavLink to="/inqury" className="text-brown-700 hover:text-gray-700 transition-colors">
-                          inqury!
+                          Fill out a inqury!
                         </NavLink>
                     </p>
                   </form>

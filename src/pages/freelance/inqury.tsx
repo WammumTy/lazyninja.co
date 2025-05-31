@@ -115,7 +115,7 @@ const Inquiry = () => {
           <div className="space-y-12">
             {/* Title & Description */}
             <div>
-              <h1 className="text-4xl font-bold mb-4 text-brown-800">Request a Website</h1>
+              <h1 className="section-title">Request a Website</h1>
               <p className="text-gray-700 text-lg">
                 Want a custom website? Fill out the form with as much detail as you can, and I’ll reach out to get started.
               </p>
@@ -185,10 +185,10 @@ const Inquiry = () => {
 
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div className="grid md:grid-cols-1 gap-4">
-                    <Input name="business" placeholder="Business Name" value={formData.business} onChange={handleChange} required />
+                    <Input name="business" placeholder="Business Name (Required)" value={formData.business} onChange={handleChange} required />
                     <Input name="business_tag" placeholder="Business Tagline" value={formData.business_tag} onChange={handleChange} />
-                    <Input name="name" placeholder="Your Name" value={formData.name} onChange={handleChange} required />
-                    <Input name="email" type="email" placeholder="Your Email" value={formData.email} onChange={handleChange} required />
+                    <Input name="name" placeholder="Your Name (Required)" value={formData.name} onChange={handleChange} required />
+                    <Input name="email" type="email" placeholder="Your Email (Required)" value={formData.email} onChange={handleChange} required />
                     <Input name="phone" placeholder="Phone Number" value={formData.phone} onChange={handleChange} />
                   </div>
 
