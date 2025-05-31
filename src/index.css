@@ -1,0 +1,77 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 30 25% 98%;
+    --foreground: 20 10% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 20 10% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 20 10% 10%;
+
+    --primary: 25 35% 35%;
+    --primary-foreground: 30 25% 98%;
+
+    --secondary: 30 15% 92%;
+    --secondary-foreground: 25 35% 35%;
+
+    --muted: 30 15% 92%;
+    --muted-foreground: 20 10% 40%;
+
+    --accent: 30 15% 92%;
+    --accent-foreground: 25 35% 35%;
+
+    --destructive: 0 85% 60%;
+    --destructive-foreground: 30 25% 98%;
+
+    --border: 20 10% 85%;
+    --input: 20 10% 85%;
+    --ring: 25 35% 35%;
+
+    --radius: 0.5rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+
+  .hero-gradient {
+    background: linear-gradient(to right, rgba(139, 69, 19, 0.05), rgba(139, 69, 19, 0.1));
+  }
+  
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .section-title {
+    @apply font-serif text-3xl md:text-4xl font-bold text-brown-800 mb-6 relative;
+  }
+  
+  .section-title::after {
+    content: "";
+    @apply absolute bottom-0 left-0 w-16 h-1 bg-brown-500 mt-2;
+  }
+  
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+  }
+
+  .nav-link {
+    @apply relative font-medium text-brown-700 hover:text-brown-900 transition-colors after:absolute after:left-0 after:bottom-0 after:h-0.5 after:w-0 after:bg-brown-600 after:transition-all hover:after:w-full;
+  }
+
+  .nav-link-active {
+    @apply text-brown-900 after:w-full;
+  }
+}
