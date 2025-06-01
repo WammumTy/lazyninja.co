@@ -14,6 +14,12 @@ import Privacy from "@/pages/legal/Privacy";
 import Inquiry from "@/pages/freelance/inqury";
 import SignupPage from "@/pages/accounts/SignupPage";
 import LoginPage from "@/pages/accounts/LoginPage";
+import BlogList from "./pages/blogs/BlogList";
+import BlogPost from "./pages/blogs/BlogPost";
+import PostBlog from "./pages/blogs/PostBlog";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import RequireAdmin from "./components/admin/RequireAdmin";
+import Dashboard from "./pages/accounts/Dashboard";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +40,16 @@ const App = () => {
               <Route path="/inqury" element={<Inquiry />} />
               <Route path="/signup" element={<SignupPage />} />
               <Route path="/login" element={<LoginPage />} />
+              <Route path="/user" element={<Dashboard />} />
+              <Route path="/blog" element={<BlogList />} />
+              <Route path="/blog/:postId" element={<BlogPost />} />
+              <Route path="/blog/post" element={<PostBlog />} />
+              <Route path="/admin" element={
+                <RequireAdmin>
+                  <AdminDashboard />
+                </RequireAdmin>
+              } />
+
 
               <Route path="*" element={<NotFound />} />
             </Routes>

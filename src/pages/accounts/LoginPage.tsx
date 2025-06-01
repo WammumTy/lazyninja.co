@@ -14,14 +14,26 @@ const LoginPage: React.FC = () => {
 
     try {
       const res = await axios.post('https://api.lazyninja.co/auth/login', { email, password });
-      console.log('✅ Login response:', res.data);
-      alert('Login successful!');
-      navigate('/'); // Redirect to homepage or /dashboard if needed
+      const { token } = res.data;
+
+      // Save token
+      localStorage.setItem('token', token);
+
+      // Decode the payload
+      const payload = JSON.parse(atob(token.split('.')[1]));
+
+      // Redirect based on admin status
+      if (payload.isAdmin) {
+        navigate('/admin');
+      } else {
+        navigate('/user');  // Normal dashboard
+      }
     } catch (err: any) {
       console.error(err);
       setError(err.response?.data?.error || 'Login failed');
     }
   };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
