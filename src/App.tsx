@@ -22,6 +22,8 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AllHosting from "./pages/admin/AllHosting";
 import AllPayments from "./pages/admin/AllPayments";
 import ManageReviews from "./pages/admin/ManageReviews";
+import Login from "./pages/Login";
+import ChangePassword from "./pages/ChangePassword";
 
 
 const queryClient = new QueryClient();
@@ -36,11 +38,18 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/contact" element={<Contact />} />
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/privacy" element={<Privacy />} />
               <Route path="/projects" element={<Projects />} />
               <Route path="/projects/:id" element={<Project />} />
               <Route path="/inqury" element={<Inquiry />} />
+
+              {/* LEGAL SHISH */}
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
+
+              {/* PUBLIC LOGIN PAGE */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/change-password" element={<ChangePassword />} />
+
               {/* PUBLIC REVIEWS PAGE */}
               <Route path="/reviews" element={<ReviewsPage />} />
 

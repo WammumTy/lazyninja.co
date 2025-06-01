@@ -1,8 +1,8 @@
 // src/services/payments.ts
 
-interface Payment {
+export interface Payment {
   id: string;
-  userEmail: string;
+  userEmail?: string; // only for admin
   amount: number;
   date: string;
   method: string;

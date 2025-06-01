@@ -1,28 +1,49 @@
 // src/pages/AdminDashboard/ManageReviews.tsx
 import { useEffect, useState } from "react";
-import { fetchAllReviews, approveReview, deleteReview } from "@/services/reviews";
+import {
+  fetchAllReviews,
+  approveReview,
+  deleteReview,
+} from "@/services/reviews";
 
 interface Review {
   id: string;
   authorName: string;
   text: string;
-  date: string;    // ISO
+  date: string;
   isApproved: boolean;
 }
+
+// ① Placeholder for admin reviews
+const placeholderAdminReviews: Review[] = [
+  {
+    id: "demo_admin_rev1",
+    authorName: "Demo User",
+    text: "No actual reviews loaded.",
+    date: new Date().toISOString(),
+    isApproved: false,
+  },
+];
 
 export default function ManageReviews() {
   const [reviews, setReviews] = useState<Review[] | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [errored, setErrored] = useState(false);
 
   useEffect(() => {
     async function getReviews() {
       try {
         const data = await fetchAllReviews();
-        setReviews(data);
+        if (!data || data.length === 0) {
+          setErrored(true);
+          setReviews(placeholderAdminReviews);
+        } else {
+          setReviews(data);
+        }
       } catch (err) {
-        console.error("Error fetching all reviews:", err);
-        setError("Failed to load reviews.");
+        console.warn("Failed to fetch all reviews; using placeholder.", err);
+        setErrored(true);
+        setReviews(placeholderAdminReviews);
       } finally {
         setLoading(false);
       }
@@ -34,7 +55,14 @@ export default function ManageReviews() {
     try {
       await approveReview(id);
       setReviews((prev) =>
-        prev?.map((r) => (r.id === id ? { ...r, isApproved: true } : r)) || null
+        prev?.map((r) =>
+          r.id === id
+            ? {
+                ...r,
+                isApproved: true,
+              }
+            : r
+        ) || null
       );
     } catch (err) {
       console.error("Error approving:", err);
@@ -51,17 +79,24 @@ export default function ManageReviews() {
   };
 
   if (loading) return <p>Loading reviews…</p>;
-  if (error) return <p className="text-red-600">{error}</p>;
-  if (!reviews || reviews.length === 0) return <p>No reviews submitted.</p>;
 
   return (
     <div>
       <h2 className="text-xl font-semibold mb-4">Manage Reviews</h2>
+
+      {errored && (
+        <p className="text-gray-500 italic mb-3">
+          Could not load real reviews. Showing placeholder reviews.
+        </p>
+      )}
+
       <div className="space-y-4">
-        {reviews.map((r) => (
+        {reviews?.map((r) => (
           <div
             key={r.id}
-            className="bg-white shadow-sm rounded-md p-4 flex justify-between items-start"
+            className={`bg-white shadow-sm rounded-md p-4 flex justify-between items-start ${
+              r.id.startsWith("demo_admin_rev") ? "bg-gray-100" : ""
+            }`}
           >
             <div>
               <p className="text-gray-800 font-medium">{r.authorName}</p>
@@ -76,14 +111,24 @@ export default function ManageReviews() {
               ) : (
                 <button
                   onClick={() => handleApprove(r.id)}
-                  className="block px-3 py-1 bg-green-500 text-white rounded-md hover:bg-green-600"
+                  disabled={r.id.startsWith("demo_admin_rev")}
+                  className={`block px-3 py-1 text-white rounded-md ${
+                    r.id.startsWith("demo_admin_rev")
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-green-500 hover:bg-green-600"
+                  }`}
                 >
                   Approve
                 </button>
               )}
               <button
                 onClick={() => handleDelete(r.id)}
-                className="block px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
+                disabled={r.id.startsWith("demo_admin_rev")}
+                className={`block px-3 py-1 text-white rounded-md ${
+                  r.id.startsWith("demo_admin_rev")
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-red-500 hover:bg-red-600"
+                }`}
               >
                 Delete
               </button>

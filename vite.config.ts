@@ -8,7 +8,14 @@ export default defineConfig(({ mode }) => ({
     host: '0.0.0.0',
     port: 5173,
     strictPort: true,  
-    cors: true
+    cors: true,
+    proxy: {
+      "/api": {
+        target: "https://api.lazyninja.co",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, "/api"),
+      },
+    },
   },
   plugins: [ react(),],
   resolve: {
