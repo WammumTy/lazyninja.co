@@ -24,11 +24,6 @@ const Navbar = () => {
 
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center gap-8">
-          <NavLink to="/" className={({isActive}) => 
-            isActive ? "nav-link nav-link-active" : "nav-link"
-          }>
-            Home
-          </NavLink>
           <NavLink to="/projects" className={({isActive}) => 
             isActive ? "nav-link nav-link-active" : "nav-link"
           }>

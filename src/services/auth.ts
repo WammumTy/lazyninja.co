@@ -4,7 +4,7 @@ export interface LoginResponse {
   token: string;
   role: "admin" | "inquirer";
   userEmail: string;
-  needPasswordChange: boolean;
+  needsPasswordChange: boolean;
 }
 
 export async function loginRequest(credentials: {

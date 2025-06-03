@@ -36,7 +36,7 @@ const Contact = () => {
     }
 
     try {
-      const res = await fetch('https://api.lazyninja.co/email/contact', {
+      const res = await fetch('https://api.lazyninja.co/api/contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

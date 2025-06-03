@@ -1,19 +1,34 @@
+// src/components/layout/DashboardLayout.tsx
+
 import { ReactNode } from "react";
+import DashboardNavbar from "./DashboardNavbar";
+import Footer from "@/components/layout/Footer";
+
+interface Tab {
+  to: string;
+  label: string;
+}
 
 interface DashboardLayoutProps {
-  menu: ReactNode;
+  /*
+   * The array of tabs for the secondary navbar (each tab = { to, label }).
+   */
+  tabs: Tab[];
+  /**
+   * Any React children (typically your <Outlet /> or page content).
+   */
   children: ReactNode;
 }
 
-export default function DashboardLayout({ menu, children }: DashboardLayoutProps) {
+export default function DashboardLayout({tabs, children }: DashboardLayoutProps) {
   return (
-    <div className="flex h-screen bg-gray-100">
-      <aside className="w-64 bg-white border-r">
-        {menu}
-      </aside>
-      <main className="flex-1 p-6 overflow-auto">
+    <div className="flex flex-col min-h-screen">
+      <DashboardNavbar tabs={tabs} />
+
+      <main className="flex-grow w-full pt-20 pb-10 max-w-7xl mx-auto">
         {children}
       </main>
+      <Footer />
     </div>
   );
 }

@@ -16,16 +16,17 @@ export default function Login() {
     setErrorMsg(null);
 
     try {
-      const { token, role, needPasswordChange } = await loginRequest({
+      const { token, role, needsPasswordChange } = await loginRequest({
         email,
         password,
       });
 
       // Store the token (you may also store userEmail if you like)
       localStorage.setItem("authToken", token);
+      localStorage.setItem("userRole", role);
 
       // If backend indicates the user must change their password, redirect to that page
-      if (needPasswordChange) {
+      if (needsPasswordChange) {
         // Pass along the role so ChangePassword knows where to go afterward
         navigate("/change-password", { state: { role } });
         return;

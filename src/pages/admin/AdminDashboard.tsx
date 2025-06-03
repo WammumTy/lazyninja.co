@@ -1,24 +1,27 @@
-// src/pages/AdminDashboard/AdminDashboard.tsx
-import { Outlet, useNavigate } from "react-router-dom";
-import PageLayout from "@/components/layout/PageLayout";
+import { useEffect } from "react";
+import { useNavigate, Outlet } from "react-router-dom";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import AdminMenu from "@/components/dashboard/AdminMenu";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
 
-  // TODO: check if user is an admin. If not, redirect to login or “not authorized”
-  // e.g. if (!isAdmin) navigate("/login");
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    const role = localStorage.getItem("userRole");
+    if (!token || role !== "admin") {
+      navigate("/login", { replace: true });
+    }
+  }, [navigate]);
+
+  const adminTabs = [
+    { to: "/admin/payments", label: "Payments" },
+    { to: "/admin/hosting", label: "Hosting" },
+    { to: "/admin/reviews", label: "Reviews" },
+  ];
 
   return (
-    <PageLayout>
-      <DashboardLayout menu={<AdminMenu />}>
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-          <p className="text-gray-600">Manage all inquirer payments, hosting, and reviews here.</p>
-        </div>
+    <DashboardLayout tabs={adminTabs}>
         <Outlet />
-      </DashboardLayout>
-    </PageLayout>
+    </DashboardLayout>
   );
 }

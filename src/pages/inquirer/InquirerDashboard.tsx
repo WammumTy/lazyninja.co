@@ -1,24 +1,27 @@
-import { Outlet, useNavigate } from "react-router-dom";
-import PageLayout from "@/components/layout/PageLayout";
+import { useEffect } from "react";
+import { useNavigate, Outlet } from "react-router-dom";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import InquirerMenu from "@/components/dashboard/InquirerMenu";
 
 export default function InquirerDashboard() {
   const navigate = useNavigate();
 
-  // TODO: replace with real auth check, or pass in user info via context
-  // For now, ensure user is “logged in” as an inquirer
-  // If not, redirect to login page: navigate("/login");
-  
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    const role = localStorage.getItem("userRole");
+    if (!token || role !== "inquirer") {
+      navigate("/login", { replace: true });
+    }
+  }, [navigate]);
+
+  const inquirerTabs = [
+    { to: "/inquirer/payments", label: "Payments" },
+    { to: "/inquirer/hosting", label: "Hosting" },
+    { to: "/inquirer/reviews", label: "Reviews" },
+  ];
+
   return (
-    <PageLayout>
-      <DashboardLayout menu={<InquirerMenu />}>
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold">Inquirer Dashboard</h1>
-          <p className="text-gray-600">Welcome back! View your payments or hosting status below.</p>
-        </div>
+    <DashboardLayout tabs={inquirerTabs}>
         <Outlet />
-      </DashboardLayout>
-    </PageLayout>
+    </DashboardLayout>
   );
 }
