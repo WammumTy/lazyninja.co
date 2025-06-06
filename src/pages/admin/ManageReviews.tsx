@@ -1,5 +1,7 @@
 // src/pages/AdminDashboard/ManageReviews.tsx
 import { useEffect, useState } from "react";
+import LoadingSection from "@/components/layout/LoadingSection";
+import Error from "@/components/layout/Error";
 import {
   fetchAllReviews,
   approveReview,
@@ -78,16 +80,12 @@ export default function ManageReviews() {
     }
   };
 
-  if (loading) return <p>Loading reviews…</p>;
+  if (loading) return <LoadingSection message="Loading reviews…" />;
 
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-4">Manage Reviews</h2>
-
       {errored && (
-        <p className="text-gray-500 italic mb-3">
-          Could not load real reviews. Showing placeholder reviews.
-        </p>
+        <Error message="Could not load real reviews. Showing placeholder reviews." />
       )}
 
       <div className="space-y-4">

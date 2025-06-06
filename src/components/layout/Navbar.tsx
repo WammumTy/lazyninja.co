@@ -39,6 +39,16 @@ const Navbar = () => {
           }>
             Contact
           </NavLink>
+          <NavLink to="/reviews" className={({isActive}) => 
+            isActive ? "nav-link nav-link-active" : "nav-link"
+          }>
+            Reviews
+          </NavLink>
+          <NavLink to="/login" className={({isActive}) => 
+            isActive ? "nav-link nav-link-active" : "nav-link"
+          }>
+            Client Login
+          </NavLink>
         </div>
 
         {/* Mobile Menu Button */}
@@ -85,6 +95,20 @@ const Navbar = () => {
             onClick={() => setIsOpen(false)}
           >
             Contact
+          </NavLink>
+          <NavLink to="/reviews" className={({isActive}) => 
+            isActive ? "nav-link nav-link-active" : "nav-link"
+          }>
+            Reviews
+          </NavLink>
+          <NavLink 
+            to="/login" 
+            className={({isActive}) => 
+              isActive ? "nav-link nav-link-active" : "nav-link"
+            }
+            onClick={() => setIsOpen(false)}
+          >
+            Client Login
           </NavLink>
         </div>
       )}

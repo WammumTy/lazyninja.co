@@ -13,7 +13,7 @@ import Project from "@/pages/portfolio/Project";
 import Terms from "@/pages/legal/Terms";
 import Privacy from "@/pages/legal/Privacy";
 import Inquiry from "@/pages/portfolio/inqury";
-import ReviewsPage from "./pages/ReviewsPage";
+import ReviewsPage from "./pages/portfolio/ReviewsPage";
 import InquirerDashboard from "./pages/inquirer/InquirerDashboard";
 import Payments from "./pages/inquirer/Payments";
 import Hosting from "./pages/inquirer/Hosting";
@@ -22,6 +22,8 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AllHosting from "./pages/admin/AllHosting";
 import AllPayments from "./pages/admin/AllPayments";
 import ManageReviews from "./pages/admin/ManageReviews";
+import AllInquiries from "./pages/admin/AllInquiries";
+import AllUsers from "./pages/admin/AllUsers";
 import Login from "./pages/Login";
 import ChangePassword from "./pages/ChangePassword";
 
@@ -67,6 +69,8 @@ const App = () => {
                 <Route path="payments" element={<AllPayments />} />
                 <Route path="hosting" element={<AllHosting />} />
                 <Route path="reviews" element={<ManageReviews />} />
+                <Route path="inquiries" element={<AllInquiries />} />
+                <Route path="users" element={<AllUsers />} />
               </Route>
 
 

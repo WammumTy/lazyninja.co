@@ -16,7 +16,7 @@ export default function InquirerDashboard() {
   const inquirerTabs = [
     { to: "/inquirer/payments", label: "Payments" },
     { to: "/inquirer/hosting", label: "Hosting" },
-    { to: "/inquirer/reviews", label: "Reviews" },
+    { to: "/inquirer/submit-review", label: "Submit-Review" },
   ];
 
   return (

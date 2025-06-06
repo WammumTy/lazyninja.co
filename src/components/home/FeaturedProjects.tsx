@@ -9,7 +9,7 @@ const FeaturedProjects = () => {
     <section className="py-16 md:py-24">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         <div className="mb-12">
-          <h2 className="section-title">Featured Projects</h2>
+          <h2 className="section-title">Personal Projects</h2>
           <p className="text-gray-600 max-w-2xl">
             Explore some of our recent work that showcases our approach to design and development.
             Each project represents our commitment to quality and innovation.

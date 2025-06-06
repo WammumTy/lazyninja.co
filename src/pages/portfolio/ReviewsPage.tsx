@@ -1,6 +1,8 @@
 // src/pages/ReviewsPage.tsx
 import { useEffect, useState } from "react";
-import { fetchReviews } from "../services/reviews";
+import PageLayout from "@/components/layout/PageLayout";
+import { fetchReviews } from "@/services/reviews";
+import Loading from "@/components/layout/Loading";
 import ReviewCard from "@/components/cards/ReviewCard";
 
 interface Review {
@@ -55,9 +57,10 @@ export default function ReviewsPage() {
     getAllReviews();
   }, []);
 
-  if (loading) return <p>Loading reviews…</p>;
+  if (loading) return <Loading />;
 
   return (
+   <PageLayout> 
     <div className="max-w-3xl mx-auto py-8">
       <h1 className="text-3xl font-bold mb-6 text-center">Client Reviews</h1>
 
@@ -80,5 +83,6 @@ export default function ReviewsPage() {
         ))}
       </div>
     </div>
+    </PageLayout>
   );
 }

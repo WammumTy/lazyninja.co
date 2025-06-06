@@ -11,7 +11,7 @@ export interface Payment {
 
 // Inquirer’s own payments:
 export async function getPaymentsForUser(): Promise<Payment[]> {
-  const res = await fetch("/api/payments", {
+  const res = await fetch("https://api.lazyninja.co/api/payments", {
     method: "GET",
     headers: { "Content-Type": "application/json" },
     credentials: "include", // if you rely on cookies
@@ -22,9 +22,13 @@ export async function getPaymentsForUser(): Promise<Payment[]> {
 
 // Admin wants everyone’s payments:
 export async function getAllPayments(): Promise<Payment[]> {
-  const res = await fetch("/api/admin/payments", {
+  const token = localStorage.getItem("authToken");
+  if (!token) {
+    throw new Error("No auth token found – please log in first");
+  }
+  const res = await fetch("https://api.lazyninja.co/admin/payments", {
     method: "GET",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
     credentials: "include",
   });
   if (!res.ok) throw new Error("Failed to fetch all payments");

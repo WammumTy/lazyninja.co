@@ -10,7 +10,7 @@ export interface Review {
 
 // Public: fetch only approved reviews
 export async function fetchReviews(): Promise<Review[]> {
-  const res = await fetch("/api/reviews", {
+  const res = await fetch("https://api.lazyninja.co/public/reviews", {
     method: "GET",
     headers: { "Content-Type": "application/json" },
   });
@@ -20,9 +20,13 @@ export async function fetchReviews(): Promise<Review[]> {
 
 // Inquirer: post their review (backend should mark as “pending” or “approved” automatically)
 export async function postReviewForUser(payload: { text: string }): Promise<void> {
-  const res = await fetch("/api/reviews", {
+  const token = localStorage.getItem("authToken");
+  if (!token) {
+    throw new Error("No auth token found – please log in first");
+  }
+  const res = await fetch("https://api.lazyninja.co/api/reviews", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
     credentials: "include",
     body: JSON.stringify(payload),
   });
@@ -31,9 +35,13 @@ export async function postReviewForUser(payload: { text: string }): Promise<void
 
 // Admin: fetch every review (approved or pending)
 export async function fetchAllReviews(): Promise<Review[]> {
-  const res = await fetch("/api/admin/reviews", {
+  const token = localStorage.getItem("authToken");
+  if (!token) {
+    throw new Error("No auth token found – please log in first");
+  }
+  const res = await fetch("https://api.lazyninja.co/admin/reviews", {
     method: "GET",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
     credentials: "include",
   });
   if (!res.ok) throw new Error("Failed to fetch all reviews");
@@ -42,9 +50,13 @@ export async function fetchAllReviews(): Promise<Review[]> {
 
 // Admin: mark a review as approved
 export async function approveReview(id: string): Promise<void> {
-  const res = await fetch(`/api/admin/reviews/${id}/approve`, {
+  const token = localStorage.getItem("authToken");
+  if (!token) {
+    throw new Error("No auth token found – please log in first");
+  }
+  const res = await fetch(`https://api.lazyninja.co/admin/reviews/${id}/approve`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
     credentials: "include",
   });
   if (!res.ok) throw new Error("Failed to approve review");
@@ -52,9 +64,13 @@ export async function approveReview(id: string): Promise<void> {
 
 // Admin: delete a review
 export async function deleteReview(id: string): Promise<void> {
-  const res = await fetch(`/api/admin/reviews/${id}`, {
+  const token = localStorage.getItem("authToken");
+  if (!token) {
+    throw new Error("No auth token found – please log in first");
+  }
+  const res = await fetch(`https://api.lazyninja.co/admin/reviews/${id}`, {
     method: "DELETE",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
     credentials: "include",
   });
   if (!res.ok) throw new Error("Failed to delete review");

@@ -11,7 +11,7 @@ export async function loginRequest(credentials: {
   email: string;
   password: string;
 }): Promise<LoginResponse> {
-  const res = await fetch("/api/login", {
+  const res = await fetch("https://api.lazyninja.co/api/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include", // if you’re using cookies; otherwise omit
@@ -24,7 +24,6 @@ export async function loginRequest(credentials: {
   return res.json();
 }
 
-// Add a new endpoint that actually changes the password:
 export interface ChangePasswordResponse {
   message: string;             // e.g. "Password updated"
   token?: string;              // (optional) new token if your backend issues a fresh one
@@ -34,12 +33,10 @@ export interface ChangePasswordResponse {
 export async function updatePasswordRequest(payload: {
   newPassword: string;
 }): Promise<ChangePasswordResponse> {
-  const res = await fetch("/api/update-password", {
+  const res = await fetch("https://api.lazyninja.co/api/users/change-password", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      // pass the existing token in the Authorization header or cookie,
-      // depending on how you handle auth server‐side.
       Authorization: `Bearer ${localStorage.getItem("authToken")}`,
     },
     body: JSON.stringify(payload),
@@ -47,6 +44,31 @@ export async function updatePasswordRequest(payload: {
   if (!res.ok) {
     const err = await res.json().catch(() => null);
     throw new Error(err?.message || "Failed to update password");
+  }
+  return res.json();
+}
+
+export interface InquirerUser {
+  id: string;
+  email: string;
+  name: string;
+  role: "inquirer";
+  needsPasswordChange: boolean;
+}
+
+export async function getAllInquirerUsers(): Promise<InquirerUser[]> {
+  const token = localStorage.getItem('authToken');
+  const res = await fetch("https://api.lazyninja.co/admin/users", {
+    method: "GET",
+    headers: { 
+      "Content-Type": "application/json", 
+      "Authorization": `Bearer ${token}`,
+    },
+    credentials: "include",
+  });
+  if (!res.ok) {
+    const errBody = await res.json().catch(() => null);
+    throw new Error(errBody?.message || "Failed to fetch inquirer users");
   }
   return res.json();
 }

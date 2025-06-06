@@ -48,6 +48,11 @@ const Footer = () => {
                   Contact
                 </NavLink>
               </li>
+              <li>
+                <NavLink to="/login" className="text-gray-300 hover:text-white transition-colors">
+                  Client Login
+                </NavLink>
+              </li>
             </ul>
           </div>
 

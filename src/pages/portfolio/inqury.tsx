@@ -1,112 +1,140 @@
-import PageLayout from '@/components/layout/PageLayout';
+import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { NavLink } from 'react-router-dom';
-import { PACKAGES, ADDONS } from '@/data/services';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { useState } from 'react';
-import { useToast } from '@/components/ui/use-toast';
+import { Button } from '@/components/ui/button';
+import PageLayout from '@/components/layout/PageLayout';
+import { PACKAGES, ADDONS } from '@/data/services';
 
-const Inquiry = () => {
-  const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
+interface InquiryFormData {
+  business: string;
+  business_tag: string; // will map to “tags” on the backend
+  name: string;
+  email: string;
+  phone: string;
+  description: string;
+  extra: string;
+  // “features” holds all selected package titles or add‐on labels
+  features: string[];
+}
+
+export default function InquiryPage() {
+  const [formData, setFormData] = useState<InquiryFormData>({
+    business: '',
+    business_tag: '',
     name: '',
     email: '',
     phone: '',
-    business: '',
-    business_tag: '',
     description: '',
-    features: '',
     extra: '',
-    images: null as FileList | null,
+    features: [],
   });
+  const [images, setImages] = useState<File[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  // Update text inputs / textarea
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({ ...prev, images: e.target.files }));
-  };
-
-  const handleFeatureSelect = (feature: string, isPackage = false) => {
+  // Toggle a feature (either package title or add‐on) on/off
+  const handleFeatureSelect = (feature: string) => {
     setFormData((prev) => {
-      const featuresArr = prev.features ? prev.features.split(', ').filter(Boolean) : [];
-
-      let updated;
-      if (isPackage) {
-        const nonPackages = featuresArr.filter((f) => !PACKAGES.some((p) => p.title === f));
-        updated = [...nonPackages, feature];
+      const already = prev.features.includes(feature);
+      if (already) {
+        return { ...prev, features: prev.features.filter((f) => f !== feature) };
       } else {
-        const exists = featuresArr.includes(feature);
-        updated = exists
-          ? featuresArr.filter((f) => f !== feature)
-          : [...featuresArr, feature];
+        return { ...prev, features: [...prev.features, feature] };
       }
-
-      return { ...prev, features: updated.join(', ') };
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  // Handle file input – store up to however many the user picks
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    const filesArray = Array.from(e.target.files);
+    setImages(filesArray);
+  };
 
-    if (!formData.name || !formData.email || !formData.description) {
-      toast({
-        title: 'Missing Fields',
-        description: 'Name, Email, and Project Description are required.',
-        variant: 'destructive',
-      });
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (
+      !formData.business.trim() ||
+      !formData.name.trim() ||
+      !formData.email.trim() ||
+      !formData.description.trim()
+    ) {
+      alert('Business name, your name, email, and description are required.');
       return;
     }
 
+    setLoading(true);
     try {
-      const form = new FormData();
-      Object.entries(formData).forEach(([key, value]) => {
-        if (key === 'images' && value instanceof FileList) {
-          Array.from(value).forEach((file) => form.append('files', file));
-        } else {
-          form.append(key, value as string);
-        }
-      });
+      const payload = new FormData();
+      payload.append('business', formData.business.trim());
+      payload.append('tags', formData.business_tag.trim());
+      payload.append('name', formData.name.trim());
+      payload.append('email', formData.email.trim());
+      payload.append('phone', formData.phone.trim());
+      payload.append('description', formData.description.trim());
+      payload.append('extra', formData.extra.trim());
 
-      const res = await fetch('https://api.lazyninja.co/email/inqury', {
+      if (formData.features.length > 0) {
+        payload.append('features', formData.features.join(','));
+      } else {
+        payload.append('features', '');
+      }
+
+      if (images.length > 0) {
+        images.forEach((file) => {
+          payload.append('images', file);
+        });
+        payload.append('hasImages', 'true');
+      } else {
+        payload.append('hasImages', 'false');
+      }
+
+      // ← Use a relative URL
+      const response = await fetch('https://api.lazyninja.co/public/inquiries', {
         method: 'POST',
-        body: form,
+        body: payload,
       });
 
-      const result = await res.json();
-      toast({
-        title: 'Inquiry Sent!',
-        description: "Thanks! I'll be in touch shortly.",
-      });
+      if (!response.ok) {
+        const errData = await response.json().catch(() => null);
+        console.error('Error body:', errData || (await response.text()));
+        alert(`Failed to submit: ${errData?.message || response.statusText}`);
+        return;
+      }
 
+      // On success, attempt to parse the JSON
+      const data = await response.json();
+      alert(`Inquiry submitted successfully! ${data.inquiryId}`);
+
+      // Reset form state
       setFormData({
+        business: '',
+        business_tag: '',
         name: '',
         email: '',
         phone: '',
-        business: '',
-        business_tag: '',
         description: '',
-        features: '',
         extra: '',
-        images: null,
+        features: [],
       });
-    } catch (err: any) {
-      console.error('Form submission error:', err);
-      toast({
-        title: 'Submission Failed',
-        description: err.message || 'An error occurred while sending your message. Try again later.',
-        variant: 'destructive',
-      });
+      setImages([]);
+    } catch (networkErr) {
+      alert('A network error occurred while submitting. Please check your connection and try again.');
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
+
 
   return (
     <PageLayout>
@@ -117,85 +145,118 @@ const Inquiry = () => {
             <div>
               <h1 className="section-title">Request a Website</h1>
               <p className="text-gray-700 text-lg">
-                Want a custom website? Fill out the form with as much detail as you can, and I’ll reach out to get started.
+                Want a custom website? Fill out the form with as much detail as you
+                can, and I’ll reach out to get started.
               </p>
             </div>
+
             <Card className="border-0 shadow-lg">
               <CardContent className="p-8 space-y-6">
+                {/* Package Options */}
+                <div>
+                  <h3 className="text-xl font-semibold text-brown-700 mb-3">
+                    Choose a Package
+                  </h3>
+                  <div className="grid gap-4 md:grid-cols-3">
+                    {PACKAGES.map((pkg) => {
+                      const isSelected = formData.features.includes(pkg.title);
+                      return (
+                        <Card
+                          key={pkg.id}
+                          className={`cursor-pointer transition-all border-2 ${
+                            isSelected
+                              ? 'border-brown-700 bg-brown-50 shadow-md'
+                              : 'border-gray-200'
+                          }`}
+                          onClick={() => handleFeatureSelect(pkg.title)}
+                        >
+                          <CardContent className="p-4 space-y-2">
+                            <h4 className="font-bold text-lg">{pkg.title}</h4>
+                            <p className="text-sm text-gray-700">
+                              {pkg.description}
+                            </p>
+                            <ul className="text-sm text-gray-600 list-disc list-inside pl-1 pt-1 space-y-1">
+                              {pkg.features.map((feature, idx) => (
+                                <li key={idx}>{feature}</li>
+                              ))}
+                            </ul>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                </div>
 
-            {/* Package Options */}
-            <div>
-              <h3 className="text-xl font-semibold text-brown-700 mb-3">Choose a Package</h3>
-              <div className="grid gap-4 md:grid-cols-3">
-                {PACKAGES.map((pkg) => {
-                  const isSelected = formData.features.includes(pkg.title);
-                  return (
-                    <Card
-                      key={pkg.id}
-                      className={`cursor-pointer transition-all border-2 ${
-                        isSelected ? 'border-brown-700 bg-brown-50 shadow-md' : 'border-gray-200'
-                      }`}
-                      onClick={() => handleFeatureSelect(pkg.title, true)}
-                    >
-                      <CardContent className="p-4 space-y-2">
-                        <h4 className="font-bold text-lg">{pkg.title}</h4>
-                        <p className="text-sm text-gray-700">{pkg.description}</p>
-                        <ul className="text-sm text-gray-600 list-disc list-inside pl-1 pt-1 space-y-1">
-                          {pkg.features.map((feature, index) => (
-                            <li key={index}>{feature}</li>
-                          ))}
-                        </ul>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-            </div>
-            {/*formData.features && (
-              <div className="mt-4 text-sm text-gray-600">
-                Selected Package: <strong>
-                  {PACKAGES.find(pkg => formData.features.includes(pkg.name))?.name || 'None'}
-                </strong>
-              </div>
-            )*/}
-            {/* Add-on Services */}
-            <div>
-              <h3 className="text-xl font-semibold text-brown-700 mb-3">Add-on Services</h3>
-              <div className="flex flex-wrap gap-3">
-                {ADDONS.map((addon) => (
-                  <button
-                    key={addon}
-                    type="button"
-                    className={`px-4 py-2 rounded-full border text-sm transition-all ${
-                      formData.features.includes(addon)
-                        ? 'bg-brown-700 text-white border-brown-700'
-                        : 'bg-gray-100 text-gray-800 border-gray-300 hover:bg-gray-200'
-                    }`}
-                    onClick={() => handleFeatureSelect(addon)}
-                  >
-                    {addon}
-                  </button>
-                ))}
-              </div>
-            </div>
+                {/* Add-on Services */}
+                <div>
+                  <h3 className="text-xl font-semibold text-brown-700 mb-3">
+                    Add-on Services
+                  </h3>
+                  <div className="flex flex-wrap gap-3">
+                    {ADDONS.map((addon) => {
+                      const isSelected = formData.features.includes(addon);
+                      return (
+                        <button
+                          key={addon}
+                          type="button"
+                          className={`px-4 py-2 rounded-full border text-sm transition-all ${
+                            isSelected
+                              ? 'bg-brown-700 text-white border-brown-700'
+                              : 'bg-gray-100 text-gray-800 border-gray-300 hover:bg-gray-200'
+                          }`}
+                          onClick={() => handleFeatureSelect(addon)}
+                        >
+                          {addon}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
 
-            {/* Inquiry Form */}
-  
+                {/* Inquiry Form */}
                 <h3 className="text-xl font-semibold text-brown-700">Details</h3>
-
-                <form onSubmit={handleSubmit} className="space-y-5">
+                <form onSubmit={handleSubmit} className="space-y-5" encType="multipart/form-data">
                   <div className="grid md:grid-cols-1 gap-4">
-                    <Input name="business" placeholder="Business Name (Required)" value={formData.business} onChange={handleChange} required />
-                    <Input name="business_tag" placeholder="Business Tagline" value={formData.business_tag} onChange={handleChange} />
-                    <Input name="name" placeholder="Your Name (Required)" value={formData.name} onChange={handleChange} required />
-                    <Input name="email" type="email" placeholder="Your Email (Required)" value={formData.email} onChange={handleChange} required />
-                    <Input name="phone" placeholder="Phone Number" value={formData.phone} onChange={handleChange} />
+                    <Input
+                      name="business"
+                      placeholder="Business Name (Required)"
+                      value={formData.business}
+                      onChange={handleChange}
+                      required
+                    />
+                    <Input
+                      name="business_tag"
+                      placeholder="Business Tagline"
+                      value={formData.business_tag}
+                      onChange={handleChange}
+                    />
+                    <Input
+                      name="name"
+                      placeholder="Your Name (Required)"
+                      value={formData.name}
+                      onChange={handleChange}
+                      required
+                    />
+                    <Input
+                      name="email"
+                      type="email"
+                      placeholder="Your Email (Required)"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                    />
+                    <Input
+                      name="phone"
+                      placeholder="Phone Number"
+                      value={formData.phone}
+                      onChange={handleChange}
+                    />
                   </div>
 
                   <Textarea
                     name="description"
                     rows={4}
-                    placeholder="Describe what you want your website to do..."
+                    placeholder="Describe what you want your website to do... (Required)"
                     value={formData.description}
                     onChange={handleChange}
                     required
@@ -210,8 +271,16 @@ const Inquiry = () => {
                   />
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Upload any related images or videos</label>
-                    <Input name="images" type="file" multiple accept="image/*,video/*" onChange={handleFileChange} />
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Upload any related images (max 5)
+                    </label>
+                    <Input
+                      name="images"
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleFileChange}
+                    />
                   </div>
 
                   <Button
@@ -222,11 +291,15 @@ const Inquiry = () => {
                     {loading ? 'Sending...' : 'Send Inquiry'}
                   </Button>
                 </form>
+
                 <p className="text-center text-lg text-brown-800 mb-3">
-                    Not sure if you want to create a website?{' '}
-                    <NavLink to="/contact" className="text-brown-700 hover:text-gray-700 transition-colors">
-                      Contact me!
-                    </NavLink>
+                  Not sure if you want to create a website?{' '}
+                  <NavLink
+                    to="/contact"
+                    className="text-brown-700 hover:text-gray-700 transition-colors"
+                  >
+                    Contact me!
+                  </NavLink>
                 </p>
               </CardContent>
             </Card>
@@ -235,6 +308,4 @@ const Inquiry = () => {
       </section>
     </PageLayout>
   );
-};
-
-export default Inquiry;
+}

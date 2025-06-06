@@ -1,5 +1,7 @@
 // src/pages/Login.tsx
 import { useState } from "react";
+import { NavLink } from "react-router-dom";
+import PageLayout from "@/components/layout/PageLayout";
 import { useNavigate } from "react-router-dom";
 import { loginRequest } from "../services/auth";
 
@@ -47,8 +49,9 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
+    <PageLayout>
+    <div className="min-h-dvh flex items-center justify-center bg-brown-50 px-4">
+      <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md mb-32">
         <h1 className="text-2xl font-bold text-center mb-6">Log In</h1>
 
         {errorMsg && <p className="text-red-600 text-sm mb-4">{errorMsg}</p>}
@@ -87,12 +90,20 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 disabled:opacity-50"
+            className="w-full py-2 bg-brown-700 text-white font-medium rounded-md hover:bg-brown-00 disabled:opacity-50"
           >
             {loading ? "Logging in…" : "Log In"}
           </button>
+          
+           <p className="text-center text-lg text-brown-800 mb-3">
+              Dont have a account? {' '}
+              <NavLink to="/inqury" className="text-brown-700 hover:text-gray-700 transition-colors">
+                Fill out a inqury!
+              </NavLink>
+          </p>
         </form>
       </div>
     </div>
+    </PageLayout>
   );
 }
