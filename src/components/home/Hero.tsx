@@ -9,7 +9,7 @@ const Hero = () => {
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-white via-white/90 to-transparent z-10"></div>
         <img 
-          src="/pics/b4775d2f-42c7-48e8-869b-6d4670816c49.png"
+          src="/pics/b4775d2f-42c7-48e8-869b-6d4670816c49.webp"
           alt="Ninja Developer"
           className="absolute right-0 top-0 h-full object-cover sm:object-contain object-right z-0"
         />

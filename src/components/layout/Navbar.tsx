@@ -15,7 +15,7 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <NavLink to="/" className="flex items-center gap-2">
           <img 
-            src="/pics/95624b19-44de-40fd-b2cd-33af192bdbba.png" 
+            src="/pics/95624b19-44de-40fd-b2cd-33af192bdbba.webp" 
             alt="Logo" 
             className="h-10 w-10 object-contain"
           />
@@ -33,11 +33,6 @@ const Navbar = () => {
             isActive ? "nav-link nav-link-active" : "nav-link"
           }>
             Inquries
-          </NavLink>
-          <NavLink to="/contact" className={({isActive}) => 
-            isActive ? "nav-link nav-link-active" : "nav-link"
-          }>
-            Contact
           </NavLink>
           <NavLink to="/reviews" className={({isActive}) => 
             isActive ? "nav-link nav-link-active" : "nav-link"
@@ -61,15 +56,6 @@ const Navbar = () => {
       {isOpen && (
         <div className="md:hidden absolute top-16 left-0 right-0 bg-white shadow-md py-4 px-6 flex flex-col gap-4 animate-fade-in">
           <NavLink 
-            to="/" 
-            className={({isActive}) => 
-              isActive ? "nav-link nav-link-active" : "nav-link"
-            }
-            onClick={() => setIsOpen(false)}
-          >
-            Home
-          </NavLink>
-          <NavLink 
             to="/projects" 
             className={({isActive}) => 
               isActive ? "nav-link nav-link-active" : "nav-link"
@@ -86,15 +72,6 @@ const Navbar = () => {
             onClick={() => setIsOpen(false)}
           >
             Inquries
-          </NavLink>
-          <NavLink 
-            to="/contact" 
-            className={({isActive}) => 
-              isActive ? "nav-link nav-link-active" : "nav-link"
-            }
-            onClick={() => setIsOpen(false)}
-          >
-            Contact
           </NavLink>
           <NavLink to="/reviews" className={({isActive}) => 
             isActive ? "nav-link nav-link-active" : "nav-link"

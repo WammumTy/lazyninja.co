@@ -12,7 +12,7 @@ export default function Error({
   retryText = "Retry",
 }: SectionErrorProps) {
   return (
-    <div className="flex flex-col items-center bg-white rounded-lg shadow-sm p-6">
+    <div className="flex flex-col items-center bg-white rounded-lg shadow-sm pt-14 p-6">
       <AlertTriangle className="w-8 h-8 text-red-600 mb-4" />
       <p className="text-lg font-medium text-red-600 mb-4">{message}</p>
       {onRetry && (

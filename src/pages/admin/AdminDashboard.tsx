@@ -14,11 +14,10 @@ export default function AdminDashboard() {
   }, [navigate]);
 
   const adminTabs = [
-    { to: "/admin/payments", label: "Payments" },
-    { to: "/admin/hosting", label: "Hosting" },
-    { to: "/admin/reviews", label: "Reviews" },
-    { to: "/admin/inquiries", label: "Inquiries" },
     { to: "/admin/users", label: "Users" },
+    { to: "/admin/inquiries", label: "Inquiries" },
+    { to: "/admin/payments", label: "Payments" },
+    { to: "/admin/reviews", label: "Reviews" },
   ];
 
   return (

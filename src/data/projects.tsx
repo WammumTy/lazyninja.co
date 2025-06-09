@@ -14,7 +14,7 @@ export const projects = [
       title: "Reimaged Meccanoid Robot",
       category: "Robotics",
       progress: "In Progress",
-      image: "/pics/projects/135431354464.png",
+      image: "/pics/projects/135431354464.webp",
       git: "https://github.com/WammumTy",
       description: "My childhood robot that I reprogrammed to be more advacnced and fun.",
       details: "I built a program that sends commands to an arduino board that is connected to each servo to make it able to move its arms in various ways. I also added a ultraviolet sensor on the wheels so that it will not bump into any walls."
@@ -24,7 +24,7 @@ export const projects = [
       title: "AI Daytrader",
       category: "AI/ML",
       progress: "In Progress",
-      image: "/pics/projects/315531514654.png",
+      image: "/pics/projects/315531514654.webp",
       git: "https://github.com/WammumTy",
       description: "A local application that uses AI to predict stock prices.",
       details: "This project was built using Python and uses the yfinance library to get stock data. It uses a neural network to predict stock prices based on historical data. The application is built using Python and Flask."

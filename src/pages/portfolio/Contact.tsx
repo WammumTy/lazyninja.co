@@ -82,7 +82,7 @@ const Contact = () => {
       icon: <Linkedin size={20} />,
       label: "LinkedIn",
       value: "Tyler Mummaw",
-      link: "linkedin.com/in/tymummaw",
+      link: "https://linkedin.com/in/tymummaw",
     },
   ];
 

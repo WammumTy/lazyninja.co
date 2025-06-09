@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 import PageLayout from '@/components/layout/PageLayout';
 import { PACKAGES, ADDONS } from '@/data/services';
 
@@ -32,6 +33,7 @@ export default function InquiryPage() {
   });
   const [images, setImages] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   // Update text inputs / textarea
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -69,7 +71,11 @@ export default function InquiryPage() {
       !formData.email.trim() ||
       !formData.description.trim()
     ) {
-      alert('Business name, your name, email, and description are required.');
+      toast({
+            title: 'Missing Required Fields',
+            description: 'Please fill out the required fields before submitting.',
+            variant: 'destructive',
+          });
       return;
     }
 
@@ -108,13 +114,21 @@ export default function InquiryPage() {
       if (!response.ok) {
         const errData = await response.json().catch(() => null);
         console.error('Error body:', errData || (await response.text()));
-        alert(`Failed to submit: ${errData?.message || response.statusText}`);
+        toast({
+          title: 'Submission Failed',
+          description: errData?.message || response.statusText,
+          variant: 'destructive',
+        });
         return;
       }
 
       // On success, attempt to parse the JSON
       const data = await response.json();
-      alert(`Inquiry submitted successfully! ${data.inquiryId}`);
+      toast({
+        title: 'Submission Successful',
+        description: `Inquiry submitted successfully! Reference ID: ${data.id}`,
+        variant: 'default',
+      });
 
       // Reset form state
       setFormData({
@@ -129,7 +143,11 @@ export default function InquiryPage() {
       });
       setImages([]);
     } catch (networkErr) {
-      alert('A network error occurred while submitting. Please check your connection and try again.');
+      toast({
+        title: 'Network Error',
+        description: 'A network error occurred while submitting. Please check your connection and try again.',
+        variant: 'destructive',
+      });
     } finally {
       setLoading(false);
     }

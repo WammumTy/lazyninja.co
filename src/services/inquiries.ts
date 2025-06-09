@@ -9,6 +9,8 @@ export interface Inquiry {
   features?: string;
   extra?: string;
   createdAt: string;
+  hasImages: boolean;
+  imageFolder?: string;
   // add any other fields your backend returns
 }
 

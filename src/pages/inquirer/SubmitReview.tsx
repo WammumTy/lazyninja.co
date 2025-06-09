@@ -1,5 +1,6 @@
 // src/pages/InquirerDashboard/SubmitReview.tsx
 import { useEffect, useState } from "react";
+import { Star, StarOff } from "lucide-react";
 import LoadingSection from "@/components/layout/LoadingSection";
 import Error from "@/components/layout/Error";
 import { getHostingStatusForUser } from "@/services/hosting";
@@ -10,6 +11,8 @@ export default function SubmitReview() {
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(false);
 
+  const [rating, setRating] = useState<number | null>(null);
+  const [hoverRating, setHoverRating] = useState<number | null>(null);
   const [reviewText, setReviewText] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -20,7 +23,7 @@ export default function SubmitReview() {
       try {
         const data = await getHostingStatusForUser();
         if (!data || typeof data.isLive !== "boolean") {
-          throw new Error("Invalid hosting data");
+          throw Error("Invalid hosting data");
         }
         setHostingStatus({ isLive: data.isLive });
       } catch (err) {
@@ -51,15 +54,20 @@ export default function SubmitReview() {
     e.preventDefault();
     setSuccessMsg(null);
     setSubmitError(null);
+    if (rating === null) {
+      setSubmitError("Please select a rating.");
+      return;
+    }
     if (!reviewText.trim()) {
       setSubmitError("Review cannot be empty.");
       return;
     }
     setSubmitting(true);
     try {
-      await postReviewForUser({ text: reviewText.trim() });
+      await postReviewForUser({ text: reviewText.trim(), rating: rating });
       setSuccessMsg("Thank you! Your review has been submitted.");
       setReviewText("");
+      setRating(null);
     } catch (err) {
       console.error("Error submitting review:", err);
       setSubmitError("Failed to submit review. Please try again later.");
@@ -75,14 +83,54 @@ export default function SubmitReview() {
       </h2>
       {successMsg && <p className="text-green-600 mb-2">{successMsg}</p>}
       {submitError && <p className="text-red-600 mb-2">{submitError}</p>}
+
       <form onSubmit={handleSubmit} className="space-y-4">
-        <textarea
-          value={reviewText}
-          onChange={(e) => setReviewText(e.target.value)}
-          placeholder="Share your experience…"
-          rows={5}
-          className="w-full p-3 border rounded-md border-brown-200 focus:outline-none focus:ring-brown-500 focus:border-brown-500"
-        />
+        {/* Rating selector */}
+        <div>
+          <span className="block text-sm font-medium text-brown-700 mb-1">
+            Your Rating<span className="text-red-500">*</span>
+          </span>
+          <div className="flex">
+            {[1, 2, 3, 4, 5].map((star) => {
+              const filled = hoverRating !== null
+                ? star <= hoverRating
+                : star <= (rating ?? 0);
+              return (
+                <button
+                  key={star}
+                  type="button"
+                  onClick={() => setRating(star)}
+                  onMouseEnter={() => setHoverRating(star)}
+                  onMouseLeave={() => setHoverRating(null)}
+                  className="p-1"
+                >
+                  {filled ? (
+                    <Star className="w-6 h-6 text-yellow-500" />
+                  ) : (
+                    <StarOff className="w-6 h-6 text-gray-300" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Review text */}
+        <div>
+          <label htmlFor="review" className="block text-sm font-medium text-brown-700 mb-1">
+            Your Review<span className="text-red-500">*</span>
+          </label>
+          <textarea
+            id="review"
+            value={reviewText}
+            onChange={(e) => setReviewText(e.target.value)}
+            placeholder="Share your experience…"
+            rows={5}
+            className="w-full p-3 border rounded-md border-brown-200 focus:outline-none focus:ring-brown-500 focus:border-brown-500"
+          />
+        </div>
+
+        {/* Submit button */}
         <button
           type="submit"
           disabled={submitting}

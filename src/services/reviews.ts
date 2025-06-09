@@ -1,11 +1,13 @@
 // src/services/reviews.ts
 
 export interface Review {
-  id: string;
+  authorEmail: string;
   authorName: string;
   text: string;
+  rating: number;
   date: string;
   isApproved?: boolean;
+  siteUrl?: string;
 }
 
 // Public: fetch only approved reviews
@@ -19,7 +21,7 @@ export async function fetchReviews(): Promise<Review[]> {
 }
 
 // Inquirer: post their review (backend should mark as “pending” or “approved” automatically)
-export async function postReviewForUser(payload: { text: string }): Promise<void> {
+export async function postReviewForUser(payload: { text: string, rating: number }): Promise<void> {
   const token = localStorage.getItem("authToken");
   if (!token) {
     throw new Error("No auth token found – please log in first");
@@ -49,12 +51,12 @@ export async function fetchAllReviews(): Promise<Review[]> {
 }
 
 // Admin: mark a review as approved
-export async function approveReview(id: string): Promise<void> {
+export async function approveReview(authorEmail: string): Promise<void> {
   const token = localStorage.getItem("authToken");
   if (!token) {
     throw new Error("No auth token found – please log in first");
   }
-  const res = await fetch(`https://api.lazyninja.co/admin/reviews/${id}/approve`, {
+  const res = await fetch(`https://api.lazyninja.co/admin/reviews/${authorEmail}/approve`, {
     method: "POST",
     headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
     credentials: "include",
@@ -63,12 +65,12 @@ export async function approveReview(id: string): Promise<void> {
 }
 
 // Admin: delete a review
-export async function deleteReview(id: string): Promise<void> {
+export async function deleteReview(authorEmail: string): Promise<void> {
   const token = localStorage.getItem("authToken");
   if (!token) {
     throw new Error("No auth token found – please log in first");
   }
-  const res = await fetch(`https://api.lazyninja.co/admin/reviews/${id}`, {
+  const res = await fetch(`https://api.lazyninja.co/admin/reviews/${authorEmail}`, {
     method: "DELETE",
     headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
     credentials: "include",

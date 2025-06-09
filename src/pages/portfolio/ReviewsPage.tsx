@@ -1,88 +1,73 @@
 // src/pages/ReviewsPage.tsx
 import { useEffect, useState } from "react";
 import PageLayout from "@/components/layout/PageLayout";
-import { fetchReviews } from "@/services/reviews";
+import { fetchReviews, Review } from "@/services/reviews";
 import Loading from "@/components/layout/Loading";
+import Error from "@/components/layout/Error";
 import ReviewCard from "@/components/cards/ReviewCard";
 
-interface Review {
-  id: string;
-  authorName: string;
-  text: string;
-  date: string;   // ISO
-  rating?: number;
-}
-
-// ① Some placeholder reviews
-const placeholderReviews: Review[] = [
-  {
-    id: "demo_rev_01",
-    authorName: "Your Name Here",
-    text: "“Client reviews will appear here once available!”",
-    date: new Date().toISOString(),
-    rating: 0,
-  },
-  {
-    id: "demo_rev_02",
-    authorName: "Sample Reviewer",
-    text: "“This space is reserved for real client feedback.”",
-    date: new Date().toISOString(),
-    rating: 0,
-  },
-];
-
 export default function ReviewsPage() {
-  const [reviews, setReviews] = useState<Review[] | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [errored, setErrored] = useState(false);
 
   useEffect(() => {
-    async function getAllReviews() {
+    async function loadReviews() {
       try {
-        const data = await fetchReviews();
+        const data: Review[] = await fetchReviews();
         if (!data || data.length === 0) {
           setErrored(true);
-          setReviews(placeholderReviews);
         } else {
-          setReviews(data);
+          // Map ServiceReview → UI Review
+          const uiReviews: Review[] = data.map((r) => ({
+            authorEmail: r.authorEmail,
+            authorName: r.authorName,
+            text: r.text,
+            date: r.date,
+            // If the service type is missing these, fallback sensibly
+            siteUrl: (r as any).siteUrl ?? "",
+            rating: (r as any).rating ?? 0,
+          }));
+          setReviews(uiReviews);
         }
       } catch (err) {
-        console.warn("Failed to fetch reviews; using placeholder.", err);
+        console.warn("Failed to fetch reviews:", err);
         setErrored(true);
-        setReviews(placeholderReviews);
       } finally {
         setLoading(false);
       }
     }
-    getAllReviews();
+    loadReviews();
   }, []);
 
-  if (loading) return <Loading />;
+  if (loading) {
+    return (
+      <PageLayout>
+        <Loading />
+      </PageLayout>
+    );
+  }
+
+  if (errored) {
+    return (
+      <PageLayout>
+        <Error message="No reviews found." />
+      </PageLayout>
+    );
+  }
 
   return (
-   <PageLayout> 
-    <div className="max-w-3xl mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-6 text-center">Client Reviews</h1>
-
-      {errored && (
-        <p className="text-gray-500 italic mb-4">
-          No real reviews could be loaded. Showing placeholder reviews instead.
-        </p>
-      )}
-
-      <div className="space-y-4">
-        {reviews?.map((r) => (
-          <ReviewCard
-            key={r.id}
-            review={{
-              ...r,
-              // If this is a placeholder, force a “0-star” style or gray-out stars
-              rating: r.id.startsWith("demo_rev_") ? undefined : r.rating,
-            }}
-          />
-        ))}
+    <PageLayout>
+      <div className="max-w-3xl mx-auto py-8">
+        <h1 className="text-3xl font-serif font-bold text-brown-800 mb-6 text-center">
+          Client Reviews
+        </h1>
+        <div className="space-y-6">
+          {reviews.map((r) => (
+            <ReviewCard key={r.authorEmail} review={r} />
+          ))}
+        </div>
       </div>
-    </div>
     </PageLayout>
   );
 }

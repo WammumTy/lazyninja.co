@@ -25,7 +25,7 @@ export default function DashboardLayout({tabs, children }: DashboardLayoutProps)
     <div className="flex flex-col min-h-screen">
       <DashboardNavbar tabs={tabs} />
 
-      <main className="flex-grow w-full pt-20 pb-10 px-11 max-w-7xl mx-auto">
+      <main className="flex-grow w-full pt-20 pb-10 max-w-7xl mx-auto">
         {children}
       </main>
       <Footer />

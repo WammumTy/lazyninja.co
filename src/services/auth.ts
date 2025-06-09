@@ -72,3 +72,23 @@ export async function getAllInquirerUsers(): Promise<InquirerUser[]> {
   }
   return res.json();
 }
+
+export async function deleteInquirerUser(userEmail: string): Promise<{ message: string }> {
+  const token = localStorage.getItem('authToken');
+  if (!token) {
+    throw new Error("No auth token found – please log in first");
+  }
+  const res = await fetch(`https://api.lazyninja.co/admin/users/${userEmail}`, {
+    method: "DELETE",
+    headers: { 
+      "Content-Type": "application/json", 
+      "Authorization": `Bearer ${token}`,
+    },
+    credentials: "include",
+  });
+  if (!res.ok) {
+    const errBody = await res.json().catch(() => null);
+    throw new Error(errBody?.message || "Failed to delete inquirer user");
+  }
+  return res.json();
+}

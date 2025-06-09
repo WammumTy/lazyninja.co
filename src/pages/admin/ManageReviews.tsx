@@ -6,46 +6,36 @@ import {
   fetchAllReviews,
   approveReview,
   deleteReview,
+  Review,
 } from "@/services/reviews";
 
-interface Review {
-  id: string;
-  authorName: string;
-  text: string;
-  date: string;
-  isApproved: boolean;
-}
-
-// ① Placeholder for admin reviews
-const placeholderAdminReviews: Review[] = [
-  {
-    id: "demo_admin_rev1",
-    authorName: "Demo User",
-    text: "No actual reviews loaded.",
-    date: new Date().toISOString(),
-    isApproved: false,
-  },
-];
 
 export default function ManageReviews() {
-  const [reviews, setReviews] = useState<Review[] | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [errored, setErrored] = useState(false);
 
   useEffect(() => {
     async function getReviews() {
       try {
-        const data = await fetchAllReviews();
+        const data: Review[] = await fetchAllReviews();
         if (!data || data.length === 0) {
           setErrored(true);
-          setReviews(placeholderAdminReviews);
         } else {
-          setReviews(data);
+          setReviews(
+            data.map(r => ({
+              authorEmail: r.authorEmail,
+              authorName: r.authorName,
+              text: r.text,
+              rating: r.rating,
+              date: r.date,
+              isApproved: r.isApproved,
+            }))
+          );
         }
       } catch (err) {
-        console.warn("Failed to fetch all reviews; using placeholder.", err);
+        console.warn("Failed to fetch reviews:", err);
         setErrored(true);
-        setReviews(placeholderAdminReviews);
       } finally {
         setLoading(false);
       }
@@ -53,87 +43,73 @@ export default function ManageReviews() {
     getReviews();
   }, []);
 
-  const handleApprove = async (id: string) => {
+  const handleApprove = async (authorEmail: string) => {
     try {
-      await approveReview(id);
-      setReviews((prev) =>
-        prev?.map((r) =>
-          r.id === id
-            ? {
-                ...r,
-                isApproved: true,
-              }
-            : r
-        ) || null
+      await approveReview(authorEmail);
+      setReviews(prev =>
+        prev.map(r =>
+          r.authorEmail === authorEmail ? { ...r, isApproved: true } : r
+        )
       );
     } catch (err) {
-      console.error("Error approving:", err);
+      console.error("Error approving review:", err);
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (authorEmail: string) => {
     try {
-      await deleteReview(id);
-      setReviews((prev) => prev?.filter((r) => r.id !== id) || null);
+      await deleteReview(authorEmail);
+      setReviews(prev => prev.filter(r => r.authorEmail !== authorEmail));
     } catch (err) {
-      console.error("Error deleting:", err);
+      console.error("Error deleting review:", err);
     }
   };
 
-  if (loading) return <LoadingSection message="Loading reviews…" />;
+  if (loading) {
+    return <LoadingSection message="Loading reviews…" />;
+  }
+
+  if (errored || reviews.length === 0) {
+    const message = errored
+      ? "Could not load reviews. Please try again later."
+      : "No reviews found.";
+    return <Error message={message} />;
+  }
 
   return (
-    <div>
-      {errored && (
-        <Error message="Could not load real reviews. Showing placeholder reviews." />
-      )}
-
-      <div className="space-y-4">
-        {reviews?.map((r) => (
-          <div
-            key={r.id}
-            className={`bg-white shadow-sm rounded-md p-4 flex justify-between items-start ${
-              r.id.startsWith("demo_admin_rev") ? "bg-gray-100" : ""
-            }`}
-          >
-            <div>
-              <p className="text-gray-800 font-medium">{r.authorName}</p>
-              <p className="text-gray-600 text-sm mb-2">
-                {new Date(r.date).toLocaleDateString()}
-              </p>
-              <p className="text-gray-700">{r.text}</p>
-            </div>
-            <div className="space-y-2">
-              {r.isApproved ? (
-                <span className="text-green-600 font-semibold">Approved</span>
-              ) : (
-                <button
-                  onClick={() => handleApprove(r.id)}
-                  disabled={r.id.startsWith("demo_admin_rev")}
-                  className={`block px-3 py-1 text-white rounded-md ${
-                    r.id.startsWith("demo_admin_rev")
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-green-500 hover:bg-green-600"
-                  }`}
-                >
-                  Approve
-                </button>
-              )}
-              <button
-                onClick={() => handleDelete(r.id)}
-                disabled={r.id.startsWith("demo_admin_rev")}
-                className={`block px-3 py-1 text-white rounded-md ${
-                  r.id.startsWith("demo_admin_rev")
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-red-500 hover:bg-red-600"
-                }`}
-              >
-                Delete
-              </button>
-            </div>
+    <div className="space-y-4">
+      {reviews.map(r => (
+        <div
+          key={r.authorEmail}
+          className="bg-white shadow-sm rounded-md p-4 flex justify-between items-start"
+        >
+          <div>
+            <p className="text-gray-800 font-medium">{r.authorName}</p>
+            <p className="text-gray-600 text-sm mb-2">
+              {new Date(r.date).toLocaleDateString()}
+            </p>
+            <p className="text-gray-700">{r.text}</p>
           </div>
-        ))}
-      </div>
+          <div className="space-y-2">
+            {r.isApproved ? (
+              <span className="text-green-600 font-semibold">Approved</span>
+            ) : (
+              <button
+                onClick={() => handleApprove(r.authorEmail)}
+                className="block px-3 py-1 text-white rounded-md bg-green-500 hover:bg-green-600"
+              >
+                Approve
+              </button>
+            )}
+            <button
+              onClick={() => handleDelete(r.authorEmail)}
+              className="block px-3 py-1 text-white rounded-md bg-red-500 hover:bg-red-600"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

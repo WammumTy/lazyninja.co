@@ -19,7 +19,6 @@ import Payments from "./pages/inquirer/Payments";
 import Hosting from "./pages/inquirer/Hosting";
 import SubmitReview from "./pages/inquirer/SubmitReview";
 import AdminDashboard from "./pages/admin/AdminDashboard";
-import AllHosting from "./pages/admin/AllHosting";
 import AllPayments from "./pages/admin/AllPayments";
 import ManageReviews from "./pages/admin/ManageReviews";
 import AllInquiries from "./pages/admin/AllInquiries";
@@ -65,9 +64,8 @@ const App = () => {
 
               {/* ADMIN DASHBOARD */}
               <Route path="/admin" element={<AdminDashboard />}>
-                <Route index element={<Navigate to="payments" replace />} />
+                <Route index element={<Navigate to="users" replace />} />
                 <Route path="payments" element={<AllPayments />} />
-                <Route path="hosting" element={<AllHosting />} />
                 <Route path="reviews" element={<ManageReviews />} />
                 <Route path="inquiries" element={<AllInquiries />} />
                 <Route path="users" element={<AllUsers />} />
